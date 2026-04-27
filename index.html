@@ -1310,4 +1310,93 @@ document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
       for(let j=0;j<5;j++){
         const sp=document.createElement('div');
         const sz=3+Math.random()*8, a=Math.random()*6.28, d=100+Math.random()*300;
-        sp.style.cssText=`position:absolute;left:${cx}px;top:${cy}px;width:${sz}px;height:${sz}px;border-radius:50%;background:${pick(rainbowColors)};box-shadow:0 0 12px ${c}
+        sp.style.cssText=`position:absolute;left:${cx}px;top:${cy}px;width:${sz}px;height:${sz}px;border-radius:50%;background:${pick(rainbowColors)};box-shadow:0 0 12px ${c};opacity:1;transition:all .7s;pointer-events:none;`;
+        overlay.appendChild(sp);
+        requestAnimationFrame(()=>requestAnimationFrame(()=>{
+          sp.style.transform=`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px)`;sp.style.opacity='0';
+        }));
+        setTimeout(()=>sp.remove(),900);
+      }
+
+      ci++; frame++;
+    },80);
+
+    // After dazzling display, grand finale burst
+    setTimeout(()=>{
+      clearInterval(rainIv);
+      el.style.transition='all .2s';
+      el.style.transform='scale(2)';
+      el.style.opacity='0';
+      el.style.filter='brightness(5)';
+
+      // White flash
+      bg.style.transition='all .15s';
+      bg.style.background='rgba(255,255,255,.9)';
+      setTimeout(()=>{bg.style.transition='opacity .5s';bg.style.opacity='0';},100);
+      setTimeout(()=>bg.remove(),600);
+
+      // Grand finale: logo shards + sparks everywhere
+      for(let i=0;i<50;i++){
+        const f=document.createElement('img'); f.src='logo.jpg';
+        const sz=15+Math.random()*45;
+        const a=Math.random()*6.28, d=200+Math.random()*600;
+        const c=pick(rainbowColors);
+        f.style.cssText=`position:absolute;left:${cx-sz/2}px;top:${cy-sz/2}px;width:${sz}px;height:${sz}px;border-radius:50%;object-fit:cover;opacity:1;box-shadow:0 0 20px ${c};transition:all ${.6+Math.random()*.8}s cubic-bezier(.16,1,.3,1);pointer-events:none;`;
+        overlay.appendChild(f);
+        requestAnimationFrame(()=>requestAnimationFrame(()=>{
+          f.style.transform=`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px) rotate(${Math.random()*720}deg) scale(.2)`;
+          f.style.opacity='0';
+        }));
+        setTimeout(()=>f.remove(),2000);
+      }
+
+      sparks(cx,cy,80);
+      canvasParticles(cx,cy);
+      for(let i=0;i<60;i++) cPs.push(new CP(cx,cy));
+      setTimeout(()=>el.remove(),300);
+
+      // After explosion settles, play video
+      setTimeout(()=> showVideo(), 800);
+    },2500);
+
+    cleanup(4000);
+  }
+
+  // ===== VIDEO OVERLAY =====
+  function showVideo(){
+    const vOv = document.createElement('div');
+    vOv.className = 'video-overlay';
+    vOv.innerHTML = `
+      <video src="niwatama.mp4" muted playsinline preload="auto"></video>
+      <div class="video-close">✕</div>
+    `;
+    // Append directly to body (not inside pointer-events:none overlay)
+    document.body.appendChild(vOv);
+    requestAnimationFrame(()=>requestAnimationFrame(()=> vOv.classList.add('active')));
+
+    const vid = vOv.querySelector('video');
+    const closeBtn = vOv.querySelector('.video-close');
+
+    // Start muted (browser allows this), then unmute after play starts
+    vid.play().then(()=>{
+      vid.muted = false;
+    }).catch(()=>{
+      // If even muted fails, try on user interaction
+      vid.muted = true;
+      vid.play().catch(()=>{});
+    });
+
+    function closeVideo(){
+      vOv.classList.remove('active');
+      vid.pause();
+      setTimeout(()=> vOv.remove(), 500);
+    }
+
+    closeBtn.addEventListener('click', closeVideo);
+    vOv.addEventListener('click', e => { if(e.target === vOv) closeVideo(); });
+    vid.addEventListener('ended', ()=> setTimeout(closeVideo, 500));
+  }
+})();
+</script>
+</body>
+</html>
