@@ -1,5 +1,5 @@
 # にわたま — Homepage
 
-公式ウェブサイト: https://ni-wa-tama.com
+公式ウェブサイト: https://home.ni-wa-tama.com
 
 このリポジトリは GitHub Pages で公開されています。
