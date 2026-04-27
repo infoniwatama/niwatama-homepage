@@ -1395,4 +1395,9 @@ document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
 
     closeBtn.addEventListener('click', closeVideo);
     vOv.addEventListener('click', e => { if(e.target === vOv) closeVideo(); });
-    vid.ad
+    vid.addEventListener('ended', ()=> setTimeout(closeVideo, 500));
+  }
+})();
+</script>
+</body>
+</html>
